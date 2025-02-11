@@ -29,7 +29,7 @@
     @include('modal')
     <div class="d-flex justify-content-between align-items-center">
         <h1>Gestión de competidores</h1>
-        <a href="https://github.com/rtro-dev/User_Administration_App" class="github" target="_blank">
+        <a href="https://github.com/rtro-dev/Fetch_App" class="github" target="_blank">
             <i class="fa-brands fa-github"></i> Code
         </a>
     </div>
