@@ -10,103 +10,40 @@ use App\Http\Requests\UpdatePokemonRequest;
 
 class PokemonController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
+    public function apiIndex()
     {
-        $query = Pokemon::with('trainer');
-        $filtroAplicado = false;
-        
-        // Filtrar por tipo si se especifica
-        if ($request->filled('tipo')) {
-            $query->where('tipo', $request->tipo);
-            $filtroAplicado = true;
-        }
-
-        // Filtrar por entrenador si se especifica
-        if ($request->filled('trainer_id')) {
-            $query->where('id_entrenador', $request->trainer_id);
-            $filtroAplicado = true;
-        }
-
-        $pokemon = $query->paginate(10);
-        $trainers = Trainer::all(); // filtro de entrenadores
-
-        return view('pokemon.index', compact('pokemon', 'trainers', 'filtroAplicado'));
+        $pokemon = Pokemon::paginate(10);
+        return response()->json($pokemon);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function apiShow(Pokemon $pokemon)
     {
-        $trainers = Trainer::all();
-        return view('pokemon.create', compact('trainers'));
+        return response()->json($pokemon);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    // Se cambia Request por StorePokemonRequest
-    public function store(StorePokemonRequest $request)
+    public function apiStore(StorePokemonRequest $request)
     {
-        /* $validated = $request->validate([
-            'nombre' => 'required|max:100',
-            'tipo' => 'required|max:50',
-            'nivel' => 'required|integer|min:1|max:100',
-            'id_entrenador' => 'required|exists:trainers,id'
-        ]); */
-        // La validación se hace en el FormRequest
-
-        Pokemon::create($request->validated());
-        return redirect()->route('pokemon.index')
-            ->with('success', 'Pokémon registrado exitosamente');
+        $pokemon = Pokemon::create($request->validated());
+        return response()->json([
+            'message' => 'Pokémon creado exitosamente',
+            'pokemon' => $pokemon
+        ], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function apiUpdate(UpdatePokemonRequest $request, Pokemon $pokemon)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Pokemon $pokemon)
-    {
-        $trainers = Trainer::all();
-        return view('pokemon.edit', compact('pokemon', 'trainers'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    // Se cambia Request por UpdatePokemonRequest
-    public function update(UpdatePokemonRequest $request, Pokemon $pokemon)
-    {
-        /* $validated = $request->validate([
-            'nombre' => 'required|max:100',
-            'tipo' => 'required|max:50',
-            'nivel' => 'required|integer|min:1|max:100',
-            'id_entrenador' => 'required|exists:trainers,id'
-        ]); */
-        // La validación se hace en el FormRequest
-
         $pokemon->update($request->validated());
-        return redirect()->route('pokemon.index')
-            ->with('success', 'Pokémon actualizado exitosamente');
+        return response()->json([
+            'message' => 'Pokémon actualizado exitosamente',
+            'pokemon' => $pokemon
+        ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Pokemon $pokemon)
+    public function apiDestroy(Pokemon $pokemon)
     {
         $pokemon->delete();
-        return redirect()->route('pokemon.index')
-            ->with('success', 'Pokémon eliminado exitosamente');
+        return response()->json([
+            'message' => 'Pokémon eliminado exitosamente'
+        ]);
     }
 }

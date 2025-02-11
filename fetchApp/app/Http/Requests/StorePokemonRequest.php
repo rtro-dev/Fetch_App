@@ -41,4 +41,9 @@ class StorePokemonRequest extends FormRequest
             'id_entrenador.exists' => 'El entrenador seleccionado no existe',
         ];
     }
+
+    public function wantsJson()
+    {
+        return true;
+    }
 }

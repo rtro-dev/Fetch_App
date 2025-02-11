@@ -39,4 +39,9 @@ class StoreTrainerRequest extends FormRequest
             'edad.max' => 'La edad máxima es 100 años',
         ];
     }
+
+    public function wantsJson()
+    {
+        return true;
+    }
 }

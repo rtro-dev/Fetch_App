@@ -9,92 +9,40 @@ use App\Http\Requests\UpdateTrainerRequest;
 
 class TrainerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
+    public function apiIndex()
     {
-        $query = Trainer::with('pokemon');
-        $filtroAplicado = false;
-        
-        // Filtrar por región si se especifica
-        if ($request->filled('region')) {
-            $query->where('region', $request->region);
-            $filtroAplicado = true;
-        }
-
-        $trainers = $query->paginate(10);
-        
-        return view('trainers.index', compact('trainers', 'filtroAplicado'));
+        $trainers = Trainer::paginate(10);
+        return response()->json($trainers);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function apiShow(Trainer $trainer)
     {
-        return view('trainers.create');
+        return response()->json($trainer);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    // Se cambia Request por StoreTrainerRequest
-    public function store(StoreTrainerRequest $request)
+    public function apiStore(StoreTrainerRequest $request)
     {
-        /* $validated = $request->validate([
-            'nombre' => 'required|max:100',
-            'region' => 'required|max:50',
-            'edad' => 'required|integer|min:10|max:100'
-        ]); */
-        // La validación se hace en el FormRequest
-
-        Trainer::create($request->validated());
-        return redirect()->route('trainers.index')
-            ->with('success', 'Entrenador creado exitosamente');
+        $trainer = Trainer::create($request->validated());
+        return response()->json([
+            'message' => 'Entrenador creado exitosamente',
+            'trainer' => $trainer
+        ], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function apiUpdate(UpdateTrainerRequest $request, Trainer $trainer)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Trainer $trainer)
-    {
-        return view('trainers.edit', compact('trainer'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    // Se cambia Request por UpdateTrainerRequest
-    public function update(UpdateTrainerRequest $request, Trainer $trainer)
-    {
-        /* $validated = $request->validate([
-            'nombre' => 'required|max:100',
-            'region' => 'required|max:50',
-            'edad' => 'required|integer|min:10|max:100'
-        ]); */
-        // La validación se hace en el FormRequest
-
         $trainer->update($request->validated());
-        return redirect()->route('trainers.index')
-            ->with('success', 'Entrenador actualizado exitosamente');
+        return response()->json([
+            'message' => 'Entrenador actualizado exitosamente',
+            'trainer' => $trainer
+        ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Trainer $trainer)
+    public function apiDestroy(Trainer $trainer)
     {
         $trainer->delete();
-        return redirect()->route('trainers.index')
-            ->with('success', 'Entrenador eliminado exitosamente');
+        return response()->json([
+            'message' => 'Entrenador eliminado exitosamente'
+        ]);
     }
 }
